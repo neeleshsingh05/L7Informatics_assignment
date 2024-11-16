@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chocolate House Management</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3a1f1d;
+            --secondary-color: #d4a373;
+            --accent-color: #8b4513;
+            --background-color: #fdf6e3;
+            --card-background: #fff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--primary-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--card-background);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-color);
+        }
+
+        .data-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .data-list li {
+            padding: 0.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-list li:last-child {
+            border-bottom: none;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .close {
+            float: right;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        .badge {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🍫 Chocolate House Management</h1>
+        <p>Manage your chocolate flavors, inventory, and customer suggestions</p>
+    </header>
+
+    <div class="container">
+        <div class="dashboard">
+            <!-- Flavors Section -->
+            <div class="card">
+                <h2><i class="fas fa-candy-cane"></i> Seasonal Flavors</h2>
+                <button class="btn" onclick="openModal('flavorModal')">Add New Flavor</button>
+                <ul id="flavorsList" class="data-list">
+                    <!-- Flavors will be populated here -->
+                </ul>
+            </div>
+
+            <!-- Inventory Section -->
+            <div class="card">
+                <h2><i class="fas fa-box"></i> Inventory</h2>
+                <button class="btn" onclick="openModal('inventoryModal')">Add Inventory Item</button>
+                <ul id="inventoryList" class="data-list">
+                    <!-- Inventory will be populated here -->
+                </ul>
+            </div>
+
+            <!-- Suggestions Section -->
+            <div class="card">
+                <h2><i class="fas fa-comment-alt"></i> Customer Suggestions</h2>
+                <button class="btn" onclick="openModal('suggestionModal')">Add Suggestion</button>
+                <ul id="suggestionsList" class="data-list">
+                    <!-- Suggestions will be populated here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Flavor Modal -->
+    <div id="flavorModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('flavorModal')">&times;</span>
+            <h2>Add New Flavor</h2>
+            <form id="flavorForm" onsubmit="submitForm(event, 'flavor')">
+                <div class="form-group">
+                    <label for="flavorName">Flavor Name</label>
+                    <input type="text" id="flavorName" name="flavor_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="season">Season</label>
+                    <input type="text" id="season" name="season" required>
+                </div>
+                <button type="submit" class="btn">Add Flavor</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Inventory Modal -->
+    <div id="inventoryModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('inventoryModal')">&times;</span>
+            <h2>Add Inventory Item</h2>
+            <form id="inventoryForm" onsubmit="submitForm(event, 'inventory')">
+                <div class="form-group">
+                    <label for="ingredient">Ingredient</label>
+                    <input type="text" id="ingredient" name="ingredient" required>
+                </div>
+                <div class="form-group">
+                    <label for="quantity">Quantity</label>
+                    <input type="number" id="quantity" name="quantity" required>
+                </div>
+                <button type="submit" class="btn">Add Item</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Suggestion Modal -->
+    <div id="suggestionModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('suggestionModal')">&times;</span>
+            <h2>Add Customer Suggestion</h2>
+            <form id="suggestionForm" onsubmit="submitForm(event, 'suggestion')">
+                <div class="form-group">
+                    <label for="suggestionFlavor">Flavor Name</label>
+                    <input type="text" id="suggestionFlavor" name="flavor_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="allergy">Allergy Concern</label>
+                    <input type="text" id="allergy" name="allergy" required>
+                </div>
+                <button type="submit" class="btn">Add Suggestion</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Fetch and display data when page loads
+        document.addEventListener('DOMContentLoaded', fetchData);
+
+        function fetchData() {
+            fetch('/get_flavors')
+                .then(response => response.json())
+                .then(data => {
+                    updateFlavors(data.flavors);
+                    updateInventory(data.inventory);
+                    updateSuggestions(data.suggestions);
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        function updateFlavors(flavors) {
+            const flavorsList = document.getElementById('flavorsList');
+            flavorsList.innerHTML = flavors.map(flavor => `
+                <li>
+                    ${flavor.name}
+                    <span class="badge">${flavor.season}</span>
+                </li>
+            `).join('');
+        }
+
+        function updateInventory(inventory) {
+            const inventoryList = document.getElementById('inventoryList');
+            inventoryList.innerHTML = inventory.map(item => `
+                <li>
+                    ${item.ingredient}
+                    <span class="badge">${item.quantity} units</span>
+                </li>
+            `).join('');
+        }
+
+        function updateSuggestions(suggestions) {
+            const suggestionsList = document.getElementById('suggestionsList');
+            suggestionsList.innerHTML = suggestions.map(suggestion => `
+                <li>
+                    ${suggestion.flavor_name}
+                    <span class="badge">${suggestion.allergy}</span>
+                </li>
+            `).join('');
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function submitForm(event, type) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+
+            let endpoint;
+            switch(type) {
+                case 'flavor':
+                    endpoint = '/add_flavor';
+                    break;
+                case 'inventory':
+                    endpoint = '/add_inventory';
+                    break;
+                case 'suggestion':
+                    endpoint = '/add_suggestion';
+                    break;
+            }
+
+            fetch(endpoint, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+                closeModal(`${type}Modal`);
+                fetchData();
+                form.reset();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while submitting the form');
+            });
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modals = document.getElementsByClassName('modal');
+            for (let modal of modals) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
