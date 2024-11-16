@@ -22,7 +22,7 @@ A Flask-based web application for managing a chocolate house's seasonal flavors,
 
 1. Clone the repository:
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/neeleshsingh05/L7Informatics_assignment.git
 cd chocolate-house-management
 ```
 
